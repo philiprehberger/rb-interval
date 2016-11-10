@@ -4,7 +4,7 @@
 [![Gem Version](https://badge.fury.io/rb/philiprehberger-interval.svg)](https://rubygems.org/gems/philiprehberger-interval)
 [![License](https://img.shields.io/github/license/philiprehberger/rb-interval)](LICENSE)
 
-Interval data type with overlap detection, merging, and gap finding.
+Interval data type with overlap detection, merging, and gap finding
 
 ## Requirements
 
