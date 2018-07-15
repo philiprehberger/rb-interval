@@ -44,7 +44,7 @@ module Philiprehberger
     # @param intervals [Array<Range>] the intervals to analyze
     # @return [Array<Range>] gaps between the merged intervals
     def self.gaps(intervals)
-      merged = self.merge(intervals)
+      merged = merge(intervals)
       return [] if merged.length < 2
 
       result = []
