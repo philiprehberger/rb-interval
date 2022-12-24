@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
 
   spec.summary = 'Interval data type with overlap detection, merging, and gap finding'
   spec.description = 'Closed interval data type supporting overlap detection, containment, ' \
-                       'intersection, union, subtraction, merging collections, and finding gaps. ' \
-                       'Works with any Comparable type including Numeric and Time.'
+                     'intersection, union, subtraction, merging collections, and finding gaps. ' \
+                     'Works with any Comparable type including Numeric and Time.'
   spec.homepage = 'https://philiprehberger.com/open-source-packages/ruby/philiprehberger-interval'
   spec.license = 'MIT'
 
