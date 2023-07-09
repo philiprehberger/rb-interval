@@ -4,7 +4,7 @@
 [![Gem Version](https://badge.fury.io/rb/philiprehberger-interval.svg)](https://rubygems.org/gems/philiprehberger-interval)
 [![Last updated](https://img.shields.io/github/last-commit/philiprehberger/rb-interval)](https://github.com/philiprehberger/rb-interval/commits/main)
 
-Interval data type with overlap detection, merging, and gap finding
+Interval data type with open/closed boundaries, arithmetic, merging, and gap finding
 
 ## Requirements
 
@@ -38,6 +38,32 @@ a.union(b)         # => [1, 8]
 a.include?(4)      # => true
 ```
 
+### Interval Types
+
+Supports closed, open, and half-open boundaries:
+
+```ruby
+closed     = Philiprehberger::Interval.new(1, 5, type: :closed)     # [1, 5] (default)
+open       = Philiprehberger::Interval.new(1, 5, type: :open)       # (1, 5)
+left_open  = Philiprehberger::Interval.new(1, 5, type: :left_open)  # (1, 5]
+right_open = Philiprehberger::Interval.new(1, 5, type: :right_open) # [1, 5)
+
+closed.include?(5)      # => true
+right_open.include?(5)  # => false
+```
+
+### Interval Arithmetic
+
+```ruby
+interval = Philiprehberger::Interval.new(2, 8)
+
+interval.shift(3)                    # => [5, 11]
+interval.scale(2, anchor: :left)     # => [2, 14]
+interval.scale(0.5, anchor: :center) # => [3.5, 6.5]
+interval.split(3)                    # => [[2, 4], [4, 6], [6, 8]]
+interval.clamp(10)                   # => 8
+```
+
 ### Merging Intervals
 
 ```ruby
@@ -68,15 +94,20 @@ shift.include?(Time.new(2026, 1, 1, 12))  # => true
 
 | Method | Description |
 |--------|-------------|
-| `.new(start, finish)` | Create a closed interval |
-| `#overlaps?(other)` | Check if two intervals overlap |
+| `.new(start, finish, type:)` | Create an interval (`:closed`, `:open`, `:left_open`, `:right_open`) |
+| `#type` | Return the interval boundary type |
+| `#overlaps?(other)` | Check if two intervals overlap (respects boundary types) |
 | `#contains?(other)` | Check if interval fully contains another |
 | `#adjacent?(other)` | Check if intervals are touching but not overlapping |
 | `#intersect(other)` | Return the overlap between two intervals |
 | `#union(other)` | Return the combined interval |
 | `#subtract(other)` | Remove another interval, returning remaining parts |
 | `#size` | Length of the interval |
-| `#include?(point)` | Check if a point falls within the interval |
+| `#include?(point)` | Check if a point falls within the interval (respects boundary types) |
+| `#shift(delta)` | Return new interval shifted by delta, preserving type |
+| `#scale(factor, anchor:)` | Scale width around anchor (`:center`, `:left`, `:right`) |
+| `#split(n)` | Split into n equal sub-intervals |
+| `#clamp(value)` | Clamp value to interval bounds |
 | `.merge(intervals)` | Merge overlapping intervals into non-overlapping set |
 | `.gaps(intervals)` | Find gaps between a set of intervals |
 

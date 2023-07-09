@@ -12,8 +12,8 @@ module Philiprehberger
     # @param start [Comparable] the start value
     # @param finish [Comparable] the end value
     # @return [Range] a new interval
-    def self.new(start, finish)
-      Range.new(start, finish)
+    def self.new(start, finish, type: :closed)
+      Range.new(start, finish, type: type)
     end
 
     # Merge a collection of overlapping or adjacent intervals into non-overlapping intervals.
