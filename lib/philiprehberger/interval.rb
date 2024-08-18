@@ -39,6 +39,20 @@ module Philiprehberger
       merged
     end
 
+    # Compute the common overlap across a collection of intervals.
+    #
+    # @param intervals [Array<Range>] the intervals to intersect
+    # @return [Range, nil] the common intersection, or nil if any pair is disjoint
+    def self.intersection(intervals)
+      return nil if intervals.empty?
+
+      intervals[1..].reduce(intervals.first) do |acc, current|
+        return nil if acc.nil?
+
+        acc.intersect(current)
+      end
+    end
+
     # Find gaps between a collection of intervals.
     #
     # @param intervals [Array<Range>] the intervals to analyze
