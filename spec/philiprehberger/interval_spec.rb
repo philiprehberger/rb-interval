@@ -186,6 +186,44 @@ RSpec.describe Philiprehberger::Interval do
     end
   end
 
+  describe '#overlap_ratio' do
+    it 'returns 1.0 when self is fully contained in other' do
+      a = described_class.new(3, 7)
+      b = described_class.new(1, 10)
+      expect(a.overlap_ratio(b)).to eq(1.0)
+    end
+
+    it 'returns 1.0 for identical intervals' do
+      a = described_class.new(1, 5)
+      b = described_class.new(1, 5)
+      expect(a.overlap_ratio(b)).to eq(1.0)
+    end
+
+    it 'returns 0.0 for disjoint intervals' do
+      a = described_class.new(1, 3)
+      b = described_class.new(5, 7)
+      expect(a.overlap_ratio(b)).to eq(0.0)
+    end
+
+    it 'returns 0.5 for half overlap' do
+      a = described_class.new(0, 10)
+      b = described_class.new(5, 15)
+      expect(a.overlap_ratio(b)).to eq(0.5)
+    end
+
+    it 'returns 1.0 when self is a point within other' do
+      a = described_class.new(3, 3)
+      b = described_class.new(1, 5)
+      expect(a.overlap_ratio(b)).to eq(1.0)
+    end
+
+    it 'returns 0.0 when self is a point outside other' do
+      a = described_class.new(7, 7)
+      b = described_class.new(1, 5)
+      expect(a.overlap_ratio(b)).to eq(0.0)
+    end
+  end
+
   describe '#size' do
     it 'returns the length of the interval' do
       expect(described_class.new(1, 5).size).to eq(4)

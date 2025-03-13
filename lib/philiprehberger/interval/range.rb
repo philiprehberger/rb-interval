@@ -113,6 +113,23 @@ module Philiprehberger
         @finish - @start
       end
 
+      # Return the fraction of self that is covered by another interval.
+      #
+      # Returns a Float in 0.0..1.0. Returns 0.0 if disjoint, 1.0 if self is
+      # fully contained in other. If self has zero length (a point), returns
+      # 1.0 when the point is within other, else 0.0.
+      #
+      # @param other [Range] the other interval
+      # @return [Float] the fraction of self covered by other
+      def overlap_ratio(other)
+        return other.include?(@start) ? 1.0 : 0.0 if size.zero?
+
+        overlap = intersect(other)
+        return 0.0 if overlap.nil?
+
+        overlap.size.to_f / size
+      end
+
       # Check if a point is within the interval.
       #
       # @param point [Comparable] the point to check

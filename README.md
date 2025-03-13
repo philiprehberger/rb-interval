@@ -36,6 +36,7 @@ a.overlaps?(b)     # => true
 a.intersect(b)     # => [3, 5]
 a.union(b)         # => [1, 8]
 a.include?(4)      # => true
+a.overlap_ratio(b) # => 0.5
 ```
 
 ### Interval Types
@@ -113,6 +114,7 @@ shift.include?(Time.new(2026, 1, 1, 12))  # => true
 | `#contains?(other)` | Check if interval fully contains another |
 | `#adjacent?(other)` | Check if intervals are touching but not overlapping |
 | `#intersect(other)` | Return the overlap between two intervals |
+| `#overlap_ratio(other)` | Fraction of self covered by other (0.0–1.0) |
 | `#union(other)` | Return the combined interval |
 | `#subtract(other)` | Remove another interval, returning remaining parts |
 | `#size` | Length of the interval |
