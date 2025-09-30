@@ -186,6 +186,26 @@ module Philiprehberger
         end
       end
 
+      # Return one or more random Floats within the interval.
+      #
+      # Without an argument, returns a single random Float. With an integer
+      # argument, returns an array of that many random Floats. Respects boundary
+      # types: open boundaries are excluded via rejection sampling. Returns
+      # +start+ immediately for point intervals (start == finish, closed).
+      #
+      # @param n [Integer, nil] number of samples, or nil for a single value
+      # @return [Float, Array<Float>]
+      # @raise [Error] if the interval is empty
+      def sample(n = nil)
+        raise Error, 'cannot sample an empty interval' if empty?
+
+        if n.nil?
+          sample_one
+        else
+          Array.new(n) { sample_one }
+        end
+      end
+
       # Clamp a value to the interval bounds.
       #
       # @param value [Comparable] the value to clamp
@@ -238,6 +258,22 @@ module Philiprehberger
       # @return [Boolean] true if the interval contains no points
       def empty?
         @start == @finish && @type != :closed
+      end
+
+      private
+
+      def sample_one
+        return @start.to_f if @start == @finish
+
+        lo = @start.to_f
+        hi = @finish.to_f
+
+        loop do
+          value = lo + (rand * (hi - lo))
+          left_ok  = left_closed?  ? value >= lo : value > lo
+          right_ok = right_closed? ? value <= hi : value < hi
+          return value if left_ok && right_ok
+        end
       end
     end
   end

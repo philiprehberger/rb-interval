@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-04-16
+
+### Added
+- `Range#sample(n = nil)` — return a random Float within the interval, or an array of n random Floats; respects open/closed boundaries via rejection sampling; raises on empty intervals; returns start for point intervals
+
 ## [0.4.0] - 2026-04-15
 
 ### Added

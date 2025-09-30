@@ -635,4 +635,82 @@ RSpec.describe Philiprehberger::Interval do
       expect(interval.size).to eq(2.0)
     end
   end
+
+  describe '#sample' do
+    describe 'without argument' do
+      it 'returns a Float for a closed interval' do
+        interval = described_class.new(1.0, 5.0, type: :closed)
+        result = interval.sample
+        expect(result).to be_a(Float)
+        expect(result).to be >= 1.0
+        expect(result).to be <= 5.0
+      end
+
+      it 'returns a Float strictly inside an open interval' do
+        interval = described_class.new(1.0, 5.0, type: :open)
+        100.times do
+          result = interval.sample
+          expect(result).to be > 1.0
+          expect(result).to be < 5.0
+        end
+      end
+
+      it 'returns a Float within a left_open (a, b] interval' do
+        interval = described_class.new(1.0, 5.0, type: :left_open)
+        100.times do
+          result = interval.sample
+          expect(result).to be > 1.0
+          expect(result).to be <= 5.0
+        end
+      end
+
+      it 'returns a Float within a right_open [a, b) interval' do
+        interval = described_class.new(1.0, 5.0, type: :right_open)
+        100.times do
+          result = interval.sample
+          expect(result).to be >= 1.0
+          expect(result).to be < 5.0
+        end
+      end
+
+      it 'returns start as Float for a point interval' do
+        interval = described_class.new(3.0, 3.0, type: :closed)
+        expect(interval.sample).to eq(3.0)
+      end
+    end
+
+    describe 'with integer argument' do
+      it 'returns an array of Floats for a closed interval' do
+        interval = described_class.new(0.0, 10.0)
+        results = interval.sample(5)
+        expect(results).to be_an(Array)
+        expect(results.length).to eq(5)
+        results.each do |v|
+          expect(v).to be_a(Float)
+          expect(v).to be >= 0.0
+          expect(v).to be <= 10.0
+        end
+      end
+
+      it 'returns an empty array when n is 0' do
+        interval = described_class.new(0.0, 10.0)
+        expect(interval.sample(0)).to eq([])
+      end
+
+      it 'returns an array of n Floats within an open interval' do
+        interval = described_class.new(2.0, 8.0, type: :open)
+        results = interval.sample(10)
+        expect(results.length).to eq(10)
+        results.each do |v|
+          expect(v).to be > 2.0
+          expect(v).to be < 8.0
+        end
+      end
+    end
+
+    it 'raises an error for an empty interval' do
+      interval = described_class.new(3.0, 3.0, type: :open)
+      expect { interval.sample }.to raise_error(Philiprehberger::Interval::Error)
+    end
+  end
 end
