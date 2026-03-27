@@ -94,7 +94,7 @@ module Philiprehberger
       # @param point [Comparable] the point to check
       # @return [Boolean]
       def include?(point)
-        point >= @start && point <= @finish
+        point.between?(@start, @finish)
       end
 
       # Compare intervals by start then finish.
