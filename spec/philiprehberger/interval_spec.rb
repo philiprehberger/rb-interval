@@ -289,6 +289,268 @@ RSpec.describe Philiprehberger::Interval do
     end
   end
 
+  describe '#type' do
+    it 'defaults to :closed' do
+      expect(described_class.new(1, 5).type).to eq(:closed)
+    end
+
+    it 'accepts :open' do
+      expect(described_class.new(1, 5, type: :open).type).to eq(:open)
+    end
+
+    it 'accepts :left_open' do
+      expect(described_class.new(1, 5, type: :left_open).type).to eq(:left_open)
+    end
+
+    it 'accepts :right_open' do
+      expect(described_class.new(1, 5, type: :right_open).type).to eq(:right_open)
+    end
+
+    it 'raises for invalid type' do
+      expect { described_class.new(1, 5, type: :invalid) }.to raise_error(Philiprehberger::Interval::Error)
+    end
+  end
+
+  describe '#include? with interval types' do
+    it 'closed interval includes both endpoints' do
+      interval = described_class.new(1, 5, type: :closed)
+      expect(interval.include?(1)).to be true
+      expect(interval.include?(5)).to be true
+      expect(interval.include?(3)).to be true
+    end
+
+    it 'open interval excludes both endpoints' do
+      interval = described_class.new(1, 5, type: :open)
+      expect(interval.include?(1)).to be false
+      expect(interval.include?(5)).to be false
+      expect(interval.include?(3)).to be true
+    end
+
+    it 'left_open interval excludes left, includes right' do
+      interval = described_class.new(1, 5, type: :left_open)
+      expect(interval.include?(1)).to be false
+      expect(interval.include?(5)).to be true
+      expect(interval.include?(3)).to be true
+    end
+
+    it 'right_open interval includes left, excludes right' do
+      interval = described_class.new(1, 5, type: :right_open)
+      expect(interval.include?(1)).to be true
+      expect(interval.include?(5)).to be false
+      expect(interval.include?(3)).to be true
+    end
+
+    it 'returns false for points outside all interval types' do
+      %i[closed open left_open right_open].each do |type|
+        interval = described_class.new(1, 5, type: type)
+        expect(interval.include?(0)).to be false
+        expect(interval.include?(6)).to be false
+      end
+    end
+  end
+
+  describe '#overlaps? with interval types' do
+    it 'closed intervals touching at a point overlap' do
+      a = described_class.new(1, 5, type: :closed)
+      b = described_class.new(5, 10, type: :closed)
+      expect(a.overlaps?(b)).to be true
+    end
+
+    it 'right_open and closed intervals touching at a point do not overlap' do
+      a = described_class.new(1, 5, type: :right_open)
+      b = described_class.new(5, 10, type: :closed)
+      expect(a.overlaps?(b)).to be false
+    end
+
+    it 'closed and left_open intervals touching at a point do not overlap' do
+      a = described_class.new(1, 5, type: :closed)
+      b = described_class.new(5, 10, type: :left_open)
+      expect(a.overlaps?(b)).to be false
+    end
+
+    it 'open intervals touching at a point do not overlap' do
+      a = described_class.new(1, 5, type: :open)
+      b = described_class.new(5, 10, type: :open)
+      expect(a.overlaps?(b)).to be false
+    end
+
+    it 'overlapping open intervals return true' do
+      a = described_class.new(1, 6, type: :open)
+      b = described_class.new(3, 10, type: :open)
+      expect(a.overlaps?(b)).to be true
+    end
+
+    it 'zero-width open interval does not overlap anything' do
+      a = described_class.new(3, 3, type: :open)
+      b = described_class.new(1, 5, type: :closed)
+      expect(a.overlaps?(b)).to be false
+    end
+  end
+
+  describe '#to_s with interval types' do
+    it 'formats closed as [a, b]' do
+      expect(described_class.new(1, 5, type: :closed).to_s).to eq('[1, 5]')
+    end
+
+    it 'formats open as (a, b)' do
+      expect(described_class.new(1, 5, type: :open).to_s).to eq('(1, 5)')
+    end
+
+    it 'formats left_open as (a, b]' do
+      expect(described_class.new(1, 5, type: :left_open).to_s).to eq('(1, 5]')
+    end
+
+    it 'formats right_open as [a, b)' do
+      expect(described_class.new(1, 5, type: :right_open).to_s).to eq('[1, 5)')
+    end
+  end
+
+  describe '#shift' do
+    it 'shifts interval by positive delta' do
+      interval = described_class.new(1, 5).shift(3)
+      expect(interval.start).to eq(4)
+      expect(interval.finish).to eq(8)
+    end
+
+    it 'shifts interval by negative delta' do
+      interval = described_class.new(5, 10).shift(-2)
+      expect(interval.start).to eq(3)
+      expect(interval.finish).to eq(8)
+    end
+
+    it 'preserves interval type' do
+      interval = described_class.new(1, 5, type: :open).shift(3)
+      expect(interval.type).to eq(:open)
+      expect(interval.to_s).to eq('(4, 8)')
+    end
+
+    it 'handles zero shift' do
+      interval = described_class.new(1, 5)
+      shifted = interval.shift(0)
+      expect(shifted.start).to eq(1)
+      expect(shifted.finish).to eq(5)
+    end
+  end
+
+  describe '#scale' do
+    it 'scales from center by default' do
+      interval = described_class.new(0.0, 10.0).scale(2)
+      expect(interval.start).to eq(-5.0)
+      expect(interval.finish).to eq(15.0)
+    end
+
+    it 'scales from left anchor' do
+      interval = described_class.new(0.0, 10.0).scale(2, anchor: :left)
+      expect(interval.start).to eq(0.0)
+      expect(interval.finish).to eq(20.0)
+    end
+
+    it 'scales from right anchor' do
+      interval = described_class.new(0.0, 10.0).scale(2, anchor: :right)
+      expect(interval.start).to eq(-10.0)
+      expect(interval.finish).to eq(10.0)
+    end
+
+    it 'scales down' do
+      interval = described_class.new(0.0, 10.0).scale(0.5, anchor: :left)
+      expect(interval.start).to eq(0.0)
+      expect(interval.finish).to eq(5.0)
+    end
+
+    it 'preserves interval type' do
+      interval = described_class.new(0.0, 10.0, type: :right_open).scale(2, anchor: :left)
+      expect(interval.type).to eq(:right_open)
+    end
+
+    it 'raises for invalid anchor' do
+      expect { described_class.new(0.0, 10.0).scale(2, anchor: :invalid) }.to raise_error(Philiprehberger::Interval::Error)
+    end
+  end
+
+  describe '#split' do
+    it 'splits into equal sub-intervals' do
+      parts = described_class.new(0, 10).split(2)
+      expect(parts.length).to eq(2)
+      expect(parts[0].start).to eq(0.0)
+      expect(parts[0].finish).to eq(5.0)
+      expect(parts[1].start).to eq(5.0)
+      expect(parts[1].finish).to eq(10.0)
+    end
+
+    it 'splits into three parts' do
+      parts = described_class.new(0, 9).split(3)
+      expect(parts.length).to eq(3)
+      expect(parts[0].start).to eq(0.0)
+      expect(parts[0].finish).to eq(3.0)
+      expect(parts[2].start).to eq(6.0)
+      expect(parts[2].finish).to eq(9.0)
+    end
+
+    it 'split of 1 returns equivalent interval' do
+      parts = described_class.new(1, 5).split(1)
+      expect(parts.length).to eq(1)
+      expect(parts[0].start).to eq(1.0)
+      expect(parts[0].finish).to eq(5.0)
+    end
+
+    it 'preserves interval type' do
+      parts = described_class.new(0, 10, type: :left_open).split(2)
+      expect(parts[0].type).to eq(:left_open)
+      expect(parts[1].type).to eq(:left_open)
+    end
+
+    it 'raises for non-positive n' do
+      expect { described_class.new(0, 10).split(0) }.to raise_error(Philiprehberger::Interval::Error)
+    end
+  end
+
+  describe '#clamp' do
+    it 'clamps value below interval to start' do
+      expect(described_class.new(1, 5).clamp(0)).to eq(1)
+    end
+
+    it 'clamps value above interval to finish' do
+      expect(described_class.new(1, 5).clamp(10)).to eq(5)
+    end
+
+    it 'returns value inside interval unchanged' do
+      expect(described_class.new(1, 5).clamp(3)).to eq(3)
+    end
+
+    it 'returns start for value at start' do
+      expect(described_class.new(1, 5).clamp(1)).to eq(1)
+    end
+
+    it 'returns finish for value at finish' do
+      expect(described_class.new(1, 5).clamp(5)).to eq(5)
+    end
+  end
+
+  describe 'edge cases' do
+    it 'zero-width closed interval includes its point' do
+      interval = described_class.new(3, 3, type: :closed)
+      expect(interval.include?(3)).to be true
+    end
+
+    it 'zero-width open interval excludes its point' do
+      interval = described_class.new(3, 3, type: :open)
+      expect(interval.include?(3)).to be false
+    end
+
+    it 'shift with negative delta' do
+      interval = described_class.new(10, 20, type: :left_open).shift(-15)
+      expect(interval.start).to eq(-5)
+      expect(interval.finish).to eq(5)
+      expect(interval.type).to eq(:left_open)
+    end
+
+    it 'equality considers type' do
+      a = described_class.new(1, 5, type: :closed)
+      b = described_class.new(1, 5, type: :open)
+      expect(a).not_to eq(b)
+    end
+  end
+
   describe 'with Time values' do
     it 'works with Time objects' do
       t1 = Time.new(2026, 1, 1)

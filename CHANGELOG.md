@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-03
+
+### Added
+- Open, half-open interval types via `type:` parameter (`:closed`, `:open`, `:left_open`, `:right_open`)
+- `shift` method for translating intervals
+- `scale` method for resizing around an anchor point
+- `split` method for dividing into equal sub-intervals
+- `clamp` method for constraining values to interval bounds
+
 ## [0.1.6] - 2026-03-31
 
 ### Added
