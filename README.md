@@ -83,6 +83,19 @@ Philiprehberger::Interval.gaps(intervals)
 # => [[7, 10]]
 ```
 
+### Finding a Common Intersection
+
+Compute the overlap shared by every interval, or `nil` if any pair is disjoint:
+
+```ruby
+Philiprehberger::Interval.intersection([
+  Philiprehberger::Interval.new(1, 10),
+  Philiprehberger::Interval.new(3, 8),
+  Philiprehberger::Interval.new(5, 12)
+])
+# => [5, 8]
+```
+
 ### With Time Values
 
 ```ruby
@@ -110,6 +123,7 @@ shift.include?(Time.new(2026, 1, 1, 12))  # => true
 | `#clamp(value)` | Clamp value to interval bounds |
 | `.merge(intervals)` | Merge overlapping intervals into non-overlapping set |
 | `.gaps(intervals)` | Find gaps between a set of intervals |
+| `.intersection(intervals)` | Common overlap of a collection of intervals, or `nil` |
 
 ## Development
 

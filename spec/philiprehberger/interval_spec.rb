@@ -289,6 +289,35 @@ RSpec.describe Philiprehberger::Interval do
     end
   end
 
+  describe '.intersection' do
+    it 'returns nil for empty input' do
+      expect(described_class.intersection([])).to be_nil
+    end
+
+    it 'returns the single interval for a single-element input' do
+      i = described_class.new(1, 5)
+      expect(described_class.intersection([i])).to eq(i)
+    end
+
+    it 'computes the common overlap of multiple intervals' do
+      result = described_class.intersection([
+                                              described_class.new(1, 10),
+                                              described_class.new(3, 8),
+                                              described_class.new(5, 12)
+                                            ])
+      expect(result.start).to eq(5)
+      expect(result.finish).to eq(8)
+    end
+
+    it 'returns nil when any pair is disjoint' do
+      result = described_class.intersection([
+                                              described_class.new(1, 5),
+                                              described_class.new(10, 20)
+                                            ])
+      expect(result).to be_nil
+    end
+  end
+
   describe '#type' do
     it 'defaults to :closed' do
       expect(described_class.new(1, 5).type).to eq(:closed)
