@@ -84,6 +84,19 @@ Philiprehberger::Interval.gaps(intervals)
 # => [[7, 10]]
 ```
 
+### Sampling Random Values
+
+Return one or more random Floats from within an interval. Open boundaries are respected via rejection sampling:
+
+```ruby
+interval = Philiprehberger::Interval.new(1.0, 5.0)
+interval.sample        # => 3.247... (single Float)
+interval.sample(3)     # => [1.823..., 4.501..., 2.964...]
+
+open = Philiprehberger::Interval.new(1.0, 5.0, type: :open)
+open.sample            # => always strictly between 1.0 and 5.0
+```
+
 ### Finding a Common Intersection
 
 Compute the overlap shared by every interval, or `nil` if any pair is disjoint:
@@ -123,6 +136,7 @@ shift.include?(Time.new(2026, 1, 1, 12))  # => true
 | `#scale(factor, anchor:)` | Scale width around anchor (`:center`, `:left`, `:right`) |
 | `#split(n)` | Split into n equal sub-intervals |
 | `#clamp(value)` | Clamp value to interval bounds |
+| `#sample(n = nil)` | Return a random Float, or array of n Floats, within the interval (respects boundaries) |
 | `.merge(intervals)` | Merge overlapping intervals into non-overlapping set |
 | `.gaps(intervals)` | Find gaps between a set of intervals |
 | `.intersection(intervals)` | Common overlap of a collection of intervals, or `nil` |
