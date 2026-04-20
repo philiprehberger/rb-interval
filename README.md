@@ -110,6 +110,20 @@ Philiprehberger::Interval.intersection([
 # => [5, 8]
 ```
 
+### Touching Intervals
+
+Check whether two intervals meet at exactly one point with no overlap and no gap — useful when partitioning a range so every value is covered exactly once:
+
+```ruby
+a = Philiprehberger::Interval.new(1, 5, type: :right_open) # [1, 5)
+b = Philiprehberger::Interval.new(5, 10, type: :closed)    # [5, 10]
+a.touching?(b) # => true  (5 covered once)
+
+c = Philiprehberger::Interval.new(1, 5, type: :closed)     # [1, 5]
+d = Philiprehberger::Interval.new(5, 10, type: :closed)    # [5, 10]
+c.touching?(d) # => false (5 covered twice)
+```
+
 ### With Time Values
 
 ```ruby
@@ -126,11 +140,13 @@ shift.include?(Time.new(2026, 1, 1, 12))  # => true
 | `#overlaps?(other)` | Check if two intervals overlap (respects boundary types) |
 | `#contains?(other)` | Check if interval fully contains another |
 | `#adjacent?(other)` | Check if intervals are touching but not overlapping |
+| `#touching?(other)` | Check if intervals meet at a single point with exactly one closed side |
 | `#intersect(other)` | Return the overlap between two intervals |
 | `#overlap_ratio(other)` | Fraction of self covered by other (0.0–1.0) |
 | `#union(other)` | Return the combined interval |
 | `#subtract(other)` | Remove another interval, returning remaining parts |
 | `#size` | Length of the interval |
+| `#length` | Alias for `#size` |
 | `#include?(point)` | Check if a point falls within the interval (respects boundary types) |
 | `#shift(delta)` | Return new interval shifted by delta, preserving type |
 | `#scale(factor, anchor:)` | Scale width around anchor (`:center`, `:left`, `:right`) |

@@ -234,6 +234,78 @@ RSpec.describe Philiprehberger::Interval do
     end
   end
 
+  describe '#length' do
+    it 'is an alias for #size on a closed interval' do
+      interval = described_class.new(1, 5)
+      expect(interval.length).to eq(interval.size)
+      expect(interval.length).to eq(4)
+    end
+
+    it 'matches #size for an open interval' do
+      interval = described_class.new(1, 5, type: :open)
+      expect(interval.length).to eq(interval.size)
+    end
+
+    it 'matches #size for a left_open interval' do
+      interval = described_class.new(2, 10, type: :left_open)
+      expect(interval.length).to eq(interval.size)
+      expect(interval.length).to eq(8)
+    end
+
+    it 'matches #size for a right_open interval' do
+      interval = described_class.new(2, 10, type: :right_open)
+      expect(interval.length).to eq(interval.size)
+    end
+
+    it 'returns zero for a point interval' do
+      expect(described_class.new(3, 3).length).to eq(0)
+    end
+  end
+
+  describe '#touching?' do
+    it 'returns true when right_open meets closed at a point' do
+      a = described_class.new(1, 5, type: :right_open)
+      b = described_class.new(5, 10, type: :closed)
+      expect(a.touching?(b)).to be true
+    end
+
+    it 'returns true when closed meets left_open at a point' do
+      a = described_class.new(1, 5, type: :closed)
+      b = described_class.new(5, 10, type: :left_open)
+      expect(a.touching?(b)).to be true
+    end
+
+    it 'returns true in the reverse direction (other.finish == self.start)' do
+      a = described_class.new(5, 10, type: :closed)
+      b = described_class.new(1, 5, type: :right_open)
+      expect(a.touching?(b)).to be true
+    end
+
+    it 'returns false when both endpoints are closed (point covered twice)' do
+      a = described_class.new(1, 5, type: :closed)
+      b = described_class.new(5, 10, type: :closed)
+      expect(a.touching?(b)).to be false
+    end
+
+    it 'returns false when both endpoints are open (point not covered)' do
+      a = described_class.new(1, 5, type: :right_open)
+      b = described_class.new(5, 10, type: :left_open)
+      expect(a.touching?(b)).to be false
+    end
+
+    it 'returns false for a gap between intervals' do
+      a = described_class.new(1, 5)
+      b = described_class.new(6, 10)
+      expect(a.touching?(b)).to be false
+    end
+
+    it 'returns false for overlapping intervals' do
+      a = described_class.new(1, 7)
+      b = described_class.new(5, 10)
+      expect(a.touching?(b)).to be false
+    end
+  end
+
   describe '#include?' do
     it 'returns true for point inside interval' do
       expect(described_class.new(1, 5).include?(3)).to be true

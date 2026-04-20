@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-04-21
+
+### Added
+- `Range#touching?` — strict boundary-touching predicate
+- `Range#length` — alias for `#size`
+
+### Fixed
+- `bug_report.yml` — require Ruby version; add Gem version input per guide
+
 ## [0.5.0] - 2026-04-16
 
 ### Added
