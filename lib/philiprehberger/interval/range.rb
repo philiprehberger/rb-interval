@@ -112,6 +112,27 @@ module Philiprehberger
       def size
         @finish - @start
       end
+      alias length size
+
+      # Check if this interval strictly touches another at a single endpoint.
+      #
+      # Returns +true+ iff the two intervals share exactly one endpoint value
+      # and exactly one of the two boundaries at that point is closed — so the
+      # meeting point is covered exactly once, with no gap and no overlap.
+      #
+      # @param other [Range] the other interval
+      # @return [Boolean]
+      def touching?(other)
+        return false if overlaps?(other)
+
+        if @finish == other.start
+          right_closed? ^ other.left_closed?
+        elsif other.finish == @start
+          other.right_closed? ^ left_closed?
+        else
+          false
+        end
+      end
 
       # Return the fraction of self that is covered by another interval.
       #
