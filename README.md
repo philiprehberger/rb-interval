@@ -110,6 +110,19 @@ Philiprehberger::Interval.intersection([
 # => [5, 8]
 ```
 
+### Spanning Interval
+
+Compute the smallest closed interval that contains every input — useful for charting and bounding-box queries. Spans across gaps too:
+
+```ruby
+Philiprehberger::Interval.span([
+  Philiprehberger::Interval.new(3, 7),
+  Philiprehberger::Interval.new(1, 4),
+  Philiprehberger::Interval.new(8, 10)
+])
+# => [1, 10]
+```
+
 ### Touching Intervals
 
 Check whether two intervals meet at exactly one point with no overlap and no gap — useful when partitioning a range so every value is covered exactly once:
@@ -156,6 +169,7 @@ shift.include?(Time.new(2026, 1, 1, 12))  # => true
 | `.merge(intervals)` | Merge overlapping intervals into non-overlapping set |
 | `.gaps(intervals)` | Find gaps between a set of intervals |
 | `.intersection(intervals)` | Common overlap of a collection of intervals, or `nil` |
+| `.span(intervals)` | Smallest closed interval enclosing all inputs (or `nil` if empty) |
 
 ## Development
 

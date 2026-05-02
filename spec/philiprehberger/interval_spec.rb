@@ -428,6 +428,42 @@ RSpec.describe Philiprehberger::Interval do
     end
   end
 
+  describe '.span' do
+    it 'returns nil for empty input' do
+      expect(described_class.span([])).to be_nil
+    end
+
+    it 'returns an equal interval for a single-element input' do
+      i = described_class.new(1, 5)
+      result = described_class.span([i])
+      expect(result.start).to eq(1)
+      expect(result.finish).to eq(5)
+    end
+
+    it 'returns the smallest interval covering all inputs' do
+      intervals = [
+        described_class.new(3, 7),
+        described_class.new(1, 4),
+        described_class.new(8, 10)
+      ]
+      result = described_class.span(intervals)
+      expect(result.start).to eq(1)
+      expect(result.finish).to eq(10)
+    end
+
+    it 'spans even across disjoint intervals (covering the gap)' do
+      intervals = [described_class.new(1, 2), described_class.new(8, 9)]
+      result = described_class.span(intervals)
+      expect(result.start).to eq(1)
+      expect(result.finish).to eq(9)
+    end
+
+    it 'returns a closed interval' do
+      result = described_class.span([described_class.new(0, 1, type: :open)])
+      expect(result.type).to eq(:closed)
+    end
+  end
+
   describe '#type' do
     it 'defaults to :closed' do
       expect(described_class.new(1, 5).type).to eq(:closed)

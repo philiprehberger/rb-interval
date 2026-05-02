@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-05-01
+
+### Added
+- `Interval.span(intervals)` — return the smallest closed interval containing every input interval; complements `merge` (multiple intervals on gaps) and `intersection` (common overlap)
+
 ## [0.6.0] - 2026-04-21
 
 ### Added

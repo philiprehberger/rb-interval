@@ -67,5 +67,22 @@ module Philiprehberger
       end
       result
     end
+
+    # The smallest closed interval that contains every input interval.
+    #
+    # The result spans from the minimum start to the maximum finish across
+    # all inputs and is always returned as a closed interval. Distinct from
+    # {.merge} (which yields multiple intervals when there are gaps) and
+    # {.intersection} (which yields the common overlap or nil).
+    #
+    # @param intervals [Array<Range>] the intervals to span
+    # @return [Range, nil] the enclosing interval, or `nil` if the input is empty
+    def self.span(intervals)
+      return nil if intervals.empty?
+
+      min_start = intervals.map(&:start).min
+      max_finish = intervals.map(&:finish).max
+      Range.new(min_start, max_finish)
+    end
   end
 end
